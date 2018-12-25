@@ -1,0 +1,287 @@
+object Form1: TForm1
+  Left = 1520
+  Height = 509
+  Top = 36
+  Width = 702
+  Caption = 'Form1'
+  ClientHeight = 509
+  ClientWidth = 702
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 486
+    Width = 702
+    Panels = <>
+  end
+  object PC: TPageControl
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = ToolBar1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = StatusBar1
+    Left = 0
+    Height = 460
+    Top = 26
+    Width = 702
+    ActivePage = TS_Tests
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabIndex = 3
+    TabOrder = 1
+    TabPosition = tpBottom
+    OnChange = PCChange
+    object TS_Ergo: TTabSheet
+      Caption = 'Ergo'
+      ClientHeight = 425
+      ClientWidth = 692
+      object TBWatt: TTrackBar
+        AnchorSideLeft.Control = TS_Ergo
+        AnchorSideTop.Side = asrBottom
+        AnchorSideRight.Control = TS_Ergo
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = TBRPM
+        Left = 0
+        Height = 51
+        Top = 323
+        Width = 692
+        Max = 400
+        Position = 0
+        Anchors = [akLeft, akRight, akBottom]
+        TabOrder = 0
+      end
+      object TBRPM: TTrackBar
+        AnchorSideLeft.Control = TS_Ergo
+        AnchorSideTop.Side = asrBottom
+        AnchorSideRight.Control = TS_Ergo
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = TS_Ergo
+        AnchorSideBottom.Side = asrBottom
+        Left = 0
+        Height = 51
+        Top = 374
+        Width = 692
+        Max = 199
+        Position = 0
+        Anchors = [akLeft, akRight, akBottom]
+        TabOrder = 1
+      end
+    end
+    object TS_Msg: TTabSheet
+      Caption = 'Messages'
+      ClientHeight = 425
+      ClientWidth = 692
+      object Memo: TMemo
+        AnchorSideLeft.Control = TS_Msg
+        AnchorSideTop.Control = TS_Msg
+        AnchorSideRight.Control = TS_Msg
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = TS_Msg
+        AnchorSideBottom.Side = asrBottom
+        Left = 0
+        Height = 425
+        Top = 0
+        Width = 692
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        Lines.Strings = (
+          'Memo'
+        )
+        TabOrder = 0
+      end
+    end
+    object TS_Serial: TTabSheet
+      Caption = 'Serial'
+      ClientHeight = 425
+      ClientWidth = 692
+      object BuConnect: TButton
+        AnchorSideLeft.Control = TS_Serial
+        AnchorSideTop.Control = TS_Serial
+        Left = 10
+        Height = 33
+        Top = 10
+        Width = 88
+        BorderSpacing.Left = 10
+        BorderSpacing.Top = 10
+        Caption = 'Connect'
+        OnClick = BuConnectClick
+        TabOrder = 0
+      end
+      object BuDisconnect: TButton
+        AnchorSideLeft.Control = BuConnect
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = BuConnect
+        Left = 108
+        Height = 33
+        Top = 10
+        Width = 96
+        BorderSpacing.Left = 10
+        Caption = 'Disconnect'
+        OnClick = BuDisconnectClick
+        TabOrder = 1
+      end
+      object BuTest: TButton
+        AnchorSideLeft.Control = BuConnect
+        AnchorSideTop.Control = BuConnect
+        AnchorSideTop.Side = asrBottom
+        Left = 10
+        Height = 39
+        Top = 73
+        Width = 86
+        BorderSpacing.Top = 30
+        Caption = 'Send Back'
+        OnClick = BuTestClick
+        TabOrder = 2
+      end
+    end
+    object TS_Tests: TTabSheet
+      Caption = 'Tests'
+      ClientHeight = 425
+      ClientWidth = 692
+      object TBRPMTest: TTrackBar
+        AnchorSideLeft.Control = TS_Tests
+        AnchorSideTop.Side = asrBottom
+        AnchorSideRight.Control = TS_Tests
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = TS_Tests
+        AnchorSideBottom.Side = asrBottom
+        Left = 0
+        Height = 51
+        Top = 374
+        Width = 692
+        Max = 199
+        OnChange = TBRPMTestChange
+        Position = 0
+        Anchors = [akLeft, akRight, akBottom]
+        TabOrder = 0
+      end
+      object LblSpeedH: TLabel
+        Left = 0
+        Height = 21
+        Top = 336
+        Width = 44
+        Caption = 'Speed'
+        ParentColor = False
+      end
+      object EdGear: TSpinEdit
+        Left = 96
+        Height = 33
+        Top = 296
+        Width = 64
+        MaxValue = 28
+        MinValue = 1
+        TabOrder = 1
+        Value = 1
+      end
+      object LblGearH: TLabel
+        Left = 0
+        Height = 21
+        Top = 296
+        Width = 85
+        Caption = 'Gear (Gang)'
+        ParentColor = False
+      end
+      object MemoInfo1: TMemo
+        AnchorSideRight.Control = TS_Tests
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = TBRPMTest
+        Left = 320
+        Height = 112
+        Top = 262
+        Width = 372
+        Anchors = [akRight, akBottom]
+        Lines.Strings = (
+          'Info from Daum- Manual TRS8008 Page 15'
+          '--------- '
+          'Ratio: 1,75 + (Gear - 1) * 0,98767'
+          'Distance cm: Ratio *210'
+          'Speed: RPM * Distance cm * 0,0006'
+        )
+        ReadOnly = True
+        TabOrder = 2
+      end
+      object LblSpeed: TLabel
+        AnchorSideLeft.Control = EdGear
+        AnchorSideTop.Control = LblSpeedH
+        AnchorSideTop.Side = asrCenter
+        Left = 96
+        Height = 21
+        Top = 336
+        Width = 22
+        Caption = '0.0'
+        ParentColor = False
+      end
+      object BUSpeedCalcTest: TButton
+        Left = 192
+        Height = 64
+        Top = 296
+        Width = 112
+        Caption = 'Speed Calc'
+        OnClick = BUSpeedCalcTestClick
+        TabOrder = 3
+      end
+      object BuPowerCalcTest: TButton
+        Left = 192
+        Height = 64
+        Top = 8
+        Width = 112
+        Caption = 'Power Calc '
+        OnClick = BuPowerCalcTestClick
+        TabOrder = 4
+      end
+      object LblWattH: TLabel
+        Left = 0
+        Height = 21
+        Top = 101
+        Width = 36
+        Caption = 'Watt:'
+        ParentColor = False
+      end
+      object LblWatt: TLabel
+        Left = 48
+        Height = 21
+        Top = 101
+        Width = 22
+        Caption = '0.0'
+        ParentColor = False
+      end
+    end
+  end
+  object ToolBar1: TToolBar
+    Left = 0
+    Height = 26
+    Top = 0
+    Width = 702
+    Caption = 'ToolBar1'
+    TabOrder = 2
+    object ToolButton1: TToolButton
+      Left = 1
+      Top = 2
+      Caption = 'ToolButton1'
+    end
+  end
+  object SerialFake: TLazSerial
+    Active = False
+    BaudRate = br__9600
+    DataBits = db8bits
+    Parity = pNone
+    FlowControl = fcNone
+    StopBits = sbOne
+    Device = '/dev/ttyUSB0'
+    RcvLineCRLF = False
+    OnRxData = SerialFakeRxData
+    OnStatus = SerialFakeStatus
+    Left = 504
+    Top = 16
+  end
+  object ActionList: TActionList
+    Images = ImageList
+    Left = 413
+    Top = 16
+  end
+  object ImageList: TImageList
+    Left = 413
+    Top = 80
+  end
+end
