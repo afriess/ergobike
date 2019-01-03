@@ -25,7 +25,13 @@ type
     BuTest: TButton;
     BUSpeedCalcTest: TButton;
     BuPowerCalcTest: TButton;
+    EdGear1: TSpinEdit;
     ImageList: TImageList;
+    LblGearH1: TLabel;
+    lblRPMH: TLabel;
+    lblRPMH1: TLabel;
+    lblSlopeH: TLabel;
+    lblWattH1: TLabel;
     LblWatt: TLabel;
     LblWattH: TLabel;
     LblSpeed: TLabel;
@@ -38,6 +44,7 @@ type
     EdGear: TSpinEdit;
     StatusBar1: TStatusBar;
     TBRPMTest: TTrackBar;
+    TBSlopeTest: TTrackBar;
     TS_Tests: TTabSheet;
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
@@ -109,6 +116,11 @@ end;
 
 procedure TForm1.BuConnectClick(Sender: TObject);
 begin
+  {$ifdef RasPi}
+  SerialFake.Device:= '/dev/ttyUSB0';
+  {$else}
+  SerialFake.Device:= 'com3';
+  {$endif}
   SerialFake.BaudRate:= br__9600;
   SerialFake.DataBits:= db8bits;
   SerialFake.StopBits:= sbOne;
@@ -129,7 +141,9 @@ Var
     T, Hn, cad, cCad, W, P, V,  cwaRider, aTireV, aTireH, vw,
     CwaBike, vw1, Ka, CrEff, CrV, CrH, Frg: Extended;
   Slope, adipos, CrDyn: ValReal;
+  Slope10: integer;
 begin
+  Slope10 := TBSlopeTest.Position;    // 15 = 1.5 %
   cCad := 0.002; // fixwert ?!
   //
   afCD := 0.79;
@@ -151,10 +165,12 @@ begin
   MBik  :=  12.0;  // f.mr  Gewicht Fahrrad in kg
   T     :=  20.0;  // f.T   Luft Temperatur in Grad Celisius
   Hn    := 350.0;  // f.Hn  Höhe über NN in m
-  Slope := ArcTan(0.0 * 0.01); // f.stg Steigung in Prozent
+  Slope := ArcTan((Slope10 * 0.1) * 0.01); // f.stg Steigung in Prozent
   W  := 0.0;       // f.W  Windgeschwindigkeit in km/h
   P  := 0.0;       // f.P  Leistung in W (<- wird gesucht !!)
-  V  := 11.0 * 0.27778; // f.V  Geschwindigeit
+  V := 0.0;
+  TryStrToFloat(LblSpeed.caption,V); // f.V  Geschwindigeit
+  V := V * 0.27778;
   cad := 50.0; // Cadence - Trittfrequenz pro / min
   //
   adipos := Sqrt(M/(hRider * 750));
@@ -169,6 +185,8 @@ begin
   vw1 := vw;
   cwaRider := ( 1 + cad * cCad) * afCD * adipos * ((( hRider - adipos) * afSin) + adipos);
   Ka := 176.5 * exp(-Hn * 0.0001253) * (cwaRider + CwaBike) / (273 + T);
+  //
+
   P := afCM * V * (Ka * (vw * vw1) + Frg + V * CrDyn);;
   LblWatt.Caption:= FloatToStr(P);
 end;
@@ -246,7 +264,7 @@ var
   CurPos : integer;
   Temp : char;
   SendData : string;
-  Watt,RPM,Tret : integer;
+  Watt,RPM,Tret, spd : integer;
 begin
   Result := false;
   // Daum defintion
@@ -364,6 +382,19 @@ begin
       SerialFake.WriteData(SendData);
     end;
   end
+  else if (ord(Frame[1]) = $51)  then begin
+    // Set Power
+    Memo.Append('Set Power Req');
+    if length(frame) < 3 then
+      result := true           // weitere zeichen anfordern
+    else begin
+      TBWatt.Position := Ord(Frame[3]) * 5;
+      FTempStr := '';
+      SendData:= #$51+DevAdr+Frame[3];
+      DebugString(Memo,SendData,'Set Power Answ-');
+      SerialFake.WriteData(SendData);
+    end;
+  end
   else if (ord(Frame[1]) = $64)  then begin
     // Stop Prg
     Memo.Append('Set Time Req');
@@ -389,8 +420,9 @@ begin
       if (Watt > 80) then Watt := 80;
       if (RPM >= 5) then Tret:= 1
       else Tret:= 0;
+      spd := round (RPM * ((1.75 + ( EdGear1.Value - 1) * 0.098767) * 210.0) * 0.0006);
       //                     PRG  PERS  Treten     Watt         RPM     spd     Dist   Tretzeit    joule   puls  zust gang relJoule
-      SendData:= #$40+DevAdr+#$01+#$01+char(Tret)+char(watt)+char(RPM)+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$30+#$00+#$00+#$00+#$00;
+      SendData:= #$40+DevAdr+#$01+#$01+char(Tret)+char(watt)+char(RPM)+char(spd)+#$00+#$00+#$00+#$00+#$00+#$00+#$30+#$00+#$00+#$00+#$00;
       DebugString(Memo,SendData,'Suery Run Data Answ-');
       SerialFake.WriteData(SendData);
     end;
