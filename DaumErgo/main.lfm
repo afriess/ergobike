@@ -9,6 +9,7 @@ object Form1: TForm1
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  Position = poDefault
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
@@ -27,46 +28,105 @@ object Form1: TForm1
     Height = 460
     Top = 26
     Width = 702
-    ActivePage = TS_Tests
+    ActivePage = TS_Ergo
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 3
+    TabIndex = 0
     TabOrder = 1
     TabPosition = tpBottom
     OnChange = PCChange
     object TS_Ergo: TTabSheet
       Caption = 'Ergo'
-      ClientHeight = 425
-      ClientWidth = 692
+      ClientHeight = 432
+      ClientWidth = 694
       object TBWatt: TTrackBar
-        AnchorSideLeft.Control = TS_Ergo
+        AnchorSideLeft.Control = lblWattH1
+        AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Side = asrBottom
         AnchorSideRight.Control = TS_Ergo
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Control = TBRPM
-        Left = 0
+        Left = 64
         Height = 51
-        Top = 323
-        Width = 692
+        Top = 330
+        Width = 630
         Max = 400
         Position = 0
         Anchors = [akLeft, akRight, akBottom]
         TabOrder = 0
       end
       object TBRPM: TTrackBar
-        AnchorSideLeft.Control = TS_Ergo
+        AnchorSideLeft.Control = lblRPMH1
+        AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Side = asrBottom
         AnchorSideRight.Control = TS_Ergo
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Control = TS_Ergo
         AnchorSideBottom.Side = asrBottom
-        Left = 0
+        Left = 64
         Height = 51
-        Top = 374
-        Width = 692
+        Top = 381
+        Width = 630
         Max = 199
         Position = 0
         Anchors = [akLeft, akRight, akBottom]
         TabOrder = 1
+      end
+      object lblRPMH1: TLabel
+        AnchorSideLeft.Control = TS_Ergo
+        AnchorSideTop.Control = TBRPM
+        AnchorSideTop.Side = asrCenter
+        AnchorSideRight.Control = lblWattH1
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 15
+        Top = 399
+        Width = 64
+        Anchors = [akTop, akLeft, akRight]
+        AutoSize = False
+        Caption = 'RPM'
+        ParentColor = False
+      end
+      object lblWattH1: TLabel
+        AnchorSideLeft.Control = TS_Ergo
+        AnchorSideTop.Control = TBWatt
+        AnchorSideTop.Side = asrCenter
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 15
+        Top = 348
+        Width = 64
+        AutoSize = False
+        Caption = 'Watt'
+        ParentColor = False
+      end
+      object LblGearH1: TLabel
+        AnchorSideLeft.Control = TS_Ergo
+        AnchorSideRight.Control = lblWattH1
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = TBWatt
+        Left = 0
+        Height = 15
+        Top = 295
+        Width = 64
+        Anchors = [akLeft, akRight, akBottom]
+        BorderSpacing.Bottom = 20
+        Caption = 'Gear (Gang)'
+        ParentColor = False
+      end
+      object EdGear1: TSpinEdit
+        AnchorSideLeft.Control = LblGearH1
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = LblGearH1
+        AnchorSideTop.Side = asrCenter
+        Left = 89
+        Height = 23
+        Top = 291
+        Width = 64
+        BorderSpacing.Left = 25
+        MaxValue = 28
+        MinValue = 1
+        TabOrder = 2
+        Value = 1
       end
     end
     object TS_Msg: TTabSheet
@@ -137,19 +197,19 @@ object Form1: TForm1
     end
     object TS_Tests: TTabSheet
       Caption = 'Tests'
-      ClientHeight = 425
-      ClientWidth = 692
+      ClientHeight = 432
+      ClientWidth = 694
       object TBRPMTest: TTrackBar
-        AnchorSideLeft.Control = TS_Tests
+        AnchorSideLeft.Control = lblRPMH
+        AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Side = asrBottom
         AnchorSideRight.Control = TS_Tests
         AnchorSideRight.Side = asrBottom
-        AnchorSideBottom.Control = TS_Tests
-        AnchorSideBottom.Side = asrBottom
-        Left = 0
+        AnchorSideBottom.Control = TBSlopeTest
+        Left = 72
         Height = 51
-        Top = 374
-        Width = 692
+        Top = 330
+        Width = 622
         Max = 199
         OnChange = TBRPMTestChange
         Position = 0
@@ -157,28 +217,38 @@ object Form1: TForm1
         TabOrder = 0
       end
       object LblSpeedH: TLabel
+        AnchorSideLeft.Control = TS_Tests
+        AnchorSideBottom.Control = BUSpeedCalcTest
+        AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 21
-        Top = 336
-        Width = 44
+        Height = 15
+        Top = 295
+        Width = 32
+        Anchors = [akLeft, akBottom]
         Caption = 'Speed'
         ParentColor = False
       end
       object EdGear: TSpinEdit
-        Left = 96
-        Height = 33
-        Top = 296
+        AnchorSideLeft.Control = LblGearH
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = LblGearH
+        Left = 88
+        Height = 23
+        Top = 258
         Width = 64
+        BorderSpacing.Left = 25
         MaxValue = 28
         MinValue = 1
         TabOrder = 1
         Value = 1
       end
       object LblGearH: TLabel
+        AnchorSideLeft.Control = TS_Tests
+        AnchorSideTop.Control = BUSpeedCalcTest
         Left = 0
-        Height = 21
-        Top = 296
-        Width = 85
+        Height = 15
+        Top = 258
+        Width = 63
         Caption = 'Gear (Gang)'
         ParentColor = False
       end
@@ -186,9 +256,9 @@ object Form1: TForm1
         AnchorSideRight.Control = TS_Tests
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Control = TBRPMTest
-        Left = 320
+        Left = 322
         Height = 112
-        Top = 262
+        Top = 218
         Width = 372
         Anchors = [akRight, akBottom]
         Lines.Strings = (
@@ -205,18 +275,21 @@ object Form1: TForm1
         AnchorSideLeft.Control = EdGear
         AnchorSideTop.Control = LblSpeedH
         AnchorSideTop.Side = asrCenter
-        Left = 96
-        Height = 21
-        Top = 336
-        Width = 22
+        Left = 88
+        Height = 15
+        Top = 295
+        Width = 15
         Caption = '0.0'
         ParentColor = False
       end
       object BUSpeedCalcTest: TButton
+        AnchorSideBottom.Control = TBRPMTest
         Left = 192
-        Height = 64
-        Top = 296
+        Height = 52
+        Top = 258
         Width = 112
+        Anchors = [akBottom]
+        BorderSpacing.Bottom = 20
         Caption = 'Speed Calc'
         OnClick = BUSpeedCalcTestClick
         TabOrder = 3
@@ -232,19 +305,65 @@ object Form1: TForm1
       end
       object LblWattH: TLabel
         Left = 0
-        Height = 21
+        Height = 15
         Top = 101
-        Width = 36
+        Width = 28
         Caption = 'Watt:'
         ParentColor = False
       end
       object LblWatt: TLabel
         Left = 48
-        Height = 21
+        Height = 15
         Top = 101
-        Width = 22
+        Width = 15
         Caption = '0.0'
         ParentColor = False
+      end
+      object lblRPMH: TLabel
+        AnchorSideLeft.Control = TS_Tests
+        AnchorSideTop.Control = TBRPMTest
+        AnchorSideTop.Side = asrCenter
+        Left = 0
+        Height = 15
+        Top = 348
+        Width = 72
+        AutoSize = False
+        Caption = 'RPM'
+        ParentColor = False
+      end
+      object lblSlopeH: TLabel
+        AnchorSideLeft.Control = TS_Tests
+        AnchorSideTop.Control = TBSlopeTest
+        AnchorSideTop.Side = asrCenter
+        AnchorSideRight.Control = lblRPMH
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 15
+        Top = 399
+        Width = 72
+        Anchors = [akTop, akLeft, akRight]
+        AutoSize = False
+        Caption = 'Slope % (x10)'
+        ParentColor = False
+      end
+      object TBSlopeTest: TTrackBar
+        AnchorSideLeft.Control = lblRPMH
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Side = asrBottom
+        AnchorSideRight.Control = TS_Tests
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = TS_Tests
+        AnchorSideBottom.Side = asrBottom
+        Left = 72
+        Height = 51
+        Top = 381
+        Width = 622
+        Max = 150
+        Min = -150
+        OnChange = TBRPMTestChange
+        Position = 0
+        Anchors = [akLeft, akRight, akBottom]
+        TabOrder = 5
       end
     end
   end
