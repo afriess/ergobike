@@ -92,10 +92,12 @@ var
   i: Integer;
 begin
   Str :=  SerialFake.ReadData;
-  FTempStr:= FTempStr + Str;
-  DebugString(Memo,FTempStr);
-  if not AnalyseTrames(FtempStr) then
-    FTempStr:= '';
+  if (Str <> '') and (Str <> #0) then begin
+    FTempStr:= FTempStr + Str;
+    DebugString(Memo,FTempStr);
+    if not AnalyseTrames(FtempStr) then
+      FTempStr:= '';
+  end;
 end;
 
 procedure TForm1.BuConnectClick(Sender: TObject);
@@ -191,148 +193,53 @@ var
   Watt,RPM,Tret, spd : integer;
 begin
   Result := false;
-  // Daum defintion
-  //  $12 $adr   : Reset Dev          -> $12 $pedalstate
-  //  $10 $adr   : Check Cockpit      -> $10 $adr
-  //  $11 $dummy : Get Adress         -> $11 $adr
-  //  $73 $adr   : Get Dev Version    -> $73 $adr $version
-  //  $23 $adr   : Set Prg            -> $23 $?? $?? $pedalstate
-  //  $21 $adr   : Start Prg          -> $21 $?? $pedalstate
-  //  $22 $adr   : Stop Prg           -> $22 $?? $pedalstate
-  //  unvollständig
-  //  $64        : Set date
-  //  $62        : SetTime
-  //  $d3        ; Play Sound
+  // Kettler defintion
+  // ID\r\n    : discover             -> ACK or RUN
+  //                                     0             1           2          3   4   5    6    7
+  // ST\r\n    : request all          -> heartrate \\s Cadence \\s speed*10 \\s \\s \\s \\s \\s Power
+  // pw xx.x\r\n : set power          -> meaningless
+  // cd\r\n    : Set PC mode          -> ACK or RUN
+
   if length(frame) = 0 then
     exit; //==>> nichts zu tun
-  if (ord(Frame[1]) = $12) then begin
-    // Reset
-    Memo.Append('Reset Dev Req');
-    if length(frame) < 2 then
-      result := true           // weitere zeichen anfordern
-    else begin
-      Memo.Append('');
-      FTempStr := '';
-      SendData:= #$12+DevAdr;
-      DebugString(Memo,SendData,'Reset Dev Answ-');
-      SerialFake.WriteData(SendData);
-    end;
+  if length(frame) < 2 then begin
+    result := true;           // weitere zeichen anfordern
+    exit;
+  end;
+  if (LeftStr(Frame,2) = 'ID') then begin
+    // Discover
+    Memo.Append('Discover Dev Req');
+    FTempStr := '';
+    SendData:= 'ACK'+CR+LF;
+    DebugString(Memo,SendData,'Discover Dev Answ-');
+    SerialFake.WriteData(SendData);
   end
-  else if (ord(Frame[1]) = $11)then begin
-    // Get Adress
-    Memo.Append('Get Adress Req');
-    //if length(frame) <= 1 then
-    //  result := true           // weitere zeichen anfordern
-    //else begin
-      FTempStr := '';
-      SendData:= #$11+DevAdr;
-      //SendData:= #$47+#$11;
-      DebugString(Memo,SendData,'Get Adress received Answ-');
-      SerialFake.WriteData(SendData);
-    //end;
-  end
-  else if (ord(Frame[1]) = $10) then begin
-    // Check Cockpit
-    Memo.Append('Check Cockpit Req');
-    if length(frame) < 2 then
+  else if (LeftStr(Frame,2)= 'cd')  then begin
+    // set Pc mode
+    Memo.Append('Set pcmode Req');
+    if length(frame) < 4 then
       result := true           // weitere zeichen anfordern
     else begin
       FTempStr := '';
-      sleep(10);
-      SendData:= #$10+DevAdr+#$99;
-      DebugString(Memo,SendData,'Check Cockpit Answ-');
+      SendData:= 'ACK'+CR+LF;        // send query back - in GC meaningless
+      DebugString(Memo,SendData,'Set pcmode Answ-');
       SerialFake.WriteData(SendData);
     end;
   end
-  else if (ord(Frame[1]) = $73) then begin
-    // Check Cockpit
-    Memo.Append('Get Version Req');
-    if length(frame) < 2 then
+  else if (LeftStr(Frame,2)= 'pw')  then begin
+    // set power
+    Memo.Append('Set power Req');
+    if length(frame) < 4 then
       result := true           // weitere zeichen anfordern
     else begin
       FTempStr := '';
-      sleep(10);
-      SendData:= #$73+DevAdr+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$1E;
-      DebugString(Memo,SendData,'Get Version Answ-');
+      SendData:= Frame+CR+LF;        // send query back - in GC meaningless
+      DebugString(Memo,SendData,'Set power Answ-');
       SerialFake.WriteData(SendData);
     end;
   end
-  else if (ord(Frame[1]) = $23) then begin
-    // Set Prog
-    Memo.Append('Set Prog Req');
-    if length(frame) < 3 then
-      result := true           // weitere zeichen anfordern
-    else begin
-      Temp:= Frame[3];
-      FTempStr := '';
-      SendData:= #$23+DevAdr+Temp+NTreten;
-      DebugString(Memo,SendData,'Set Prog Ans-');
-      SerialFake.WriteData(SendData);
-    end;
-  end
-  else if (ord(Frame[1]) = $21) then begin
-    // Start Prog
-    Memo.Append('Start Prog Req');
-    if length(frame) < 2 then
-      result := true           // weitere zeichen anfordern
-    else begin
-      FTempStr := '';
-      SendData:= #$21+DevAdr+NTreten;
-      DebugString(Memo,SendData,'Start Prog Answ-');
-      SerialFake.WriteData(SendData);
-    end;
-  end
-  else if (ord(Frame[1]) = $22)  then begin
-    // Stop Prg
-    Memo.Append('Stop Prg Req');
-    if length(frame) < 2 then
-      result := true           // weitere zeichen anfordern
-    else begin
-      FTempStr := '';
-      SendData:= #$22+DevAdr+NTreten;
-      DebugString(Memo,SendData,'Stop Prg Answ-');
-      SerialFake.WriteData(SendData);
-    end;
-  end
-  else if (ord(Frame[1]) = $62)  then begin
-    // Set Date
-    Memo.Append('Set Date Req');
-    if length(frame) < 2 then
-      result := true           // weitere zeichen anfordern
-    else begin
-      FTempStr := '';
-      SendData:= #$62+DevAdr;
-      DebugString(Memo,SendData,'Set Date Answ-');
-      SerialFake.WriteData(SendData);
-    end;
-  end
-  else if (ord(Frame[1]) = $51)  then begin
-    // Set Power
-    Memo.Append('Set Power Req');
-    if length(frame) < 3 then
-      result := true           // weitere zeichen anfordern
-    else begin
-      TBWatt.Position := Ord(Frame[3]) * 5;
-      FTempStr := '';
-      SendData:= #$51+DevAdr+Frame[3];
-      DebugString(Memo,SendData,'Set Power Answ-');
-      SerialFake.WriteData(SendData);
-    end;
-  end
-  else if (ord(Frame[1]) = $64)  then begin
-    // Stop Prg
-    Memo.Append('Set Time Req');
-    if length(frame) < 2 then
-      result := true           // weitere zeichen anfordern
-    else begin
-      FTempStr := '';
-      SendData:= #$64+DevAdr;
-      DebugString(Memo,SendData,'Set Time Answ-');
-      SerialFake.WriteData(SendData);
-    end;
-  end
-  else if (ord(Frame[1]) = $40)  then begin
-    // Stop Prg
+  else if (LeftStr(Frame,2)= 'ST')  then begin
+    // request all
     Memo.Append('Query Run Data Req');
     if length(frame) < 2 then
       result := true           // weitere zeichen anfordern
@@ -344,9 +251,12 @@ begin
       if (Watt > 80) then Watt := 80;
       if (RPM >= 5) then Tret:= 1
       else Tret:= 0;
-      spd := round (RPM * ((1.75 + ( EdGear1.Value - 1) * 0.098767) * 210.0) * 0.0006);
+      spd := round (RPM * ((1.75 + (0) * 0.098767) * 210.0) * 0.0006);
+      //                                     0             1           2          3   4   5    6    7
+      // ST\r\n    : request all          -> heartrate \\s Cadence \\s speed*10 \\s \\s \\s \\s \\s Power
+      SendData:= '30'+#12+IntToStr(RPM)+#12+IntToStr(spd)+#12+#20+#12+#20+#12+#20+#12+#20+#12+intToStr(watt)+CR+LF;
       //                     PRG  PERS  Treten     Watt         RPM     spd     Dist   Tretzeit    joule   puls  zust gang relJoule
-      SendData:= #$40+DevAdr+#$01+#$01+char(Tret)+char(watt)+char(RPM)+char(spd)+#$00+#$00+#$00+#$00+#$00+#$00+#$30+#$00+#$00+#$00+#$00;
+//      SendData:= #$40+DevAdr+#$01+#$01+char(Tret)+char(watt)+char(RPM)+char(spd)+#$00+#$00+#$00+#$00+#$00+#$00+#$30+#$00+#$00+#$00+#$00;
       DebugString(Memo,SendData,'Suery Run Data Answ-');
       SerialFake.WriteData(SendData);
     end;
