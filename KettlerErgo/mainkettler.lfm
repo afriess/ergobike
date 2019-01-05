@@ -188,7 +188,7 @@ object Form1: TForm1
     FlowControl = fcNone
     StopBits = sbOne
     Device = '/dev/ttyUSB0'
-    RcvLineCRLF = False
+    RcvLineCRLF = True
     OnRxData = SerialFakeRxData
     OnStatus = SerialFakeStatus
     Left = 504
