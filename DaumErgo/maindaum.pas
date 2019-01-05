@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls,
-  ExtCtrls, ActnList, Spin, LazSerial, LazSynaSer, MKnob, LedNumber;
+  ExtCtrls, ActnList, Spin, XMLPropStorage, IDEWindowIntf, LazSerial,
+  LazSynaSer, MKnob, LedNumber;
 
 
 const
@@ -16,9 +17,10 @@ const
 
 type
 
-  { TForm1 }
+  { TMainForm }
 
-  TForm1 = class(TForm)
+  TMainForm = class(TForm)
+    ActQuit: TAction;
     ActionList: TActionList;
     BuConnect: TButton;
     BuDisconnect: TButton;
@@ -37,12 +39,14 @@ type
     PC: TPageControl;
     SerialFake: TLazSerial;
     StatusBar1: TStatusBar;
-    ToolBar1: TToolBar;
+    ToolBar: TToolBar;
     ToolButton1: TToolButton;
     TS_Serial: TTabSheet;
     TS_Msg: TTabSheet;
     TS_Ergo: TTabSheet;
     TBRPM: TTrackBar;
+    XMLPropStorage1: TXMLPropStorage;
+    procedure ActQuitExecute(Sender: TObject);
     procedure BuConnectClick(Sender: TObject);
     procedure BuDisconnectClick(Sender: TObject);
     procedure BuTestClick(Sender: TObject);
@@ -64,7 +68,7 @@ type
   end;
 
 var
-  Form1: TForm1;
+  MainForm: TMainForm;
 
 implementation
 uses
@@ -76,7 +80,7 @@ var
   CurPos: Integer;
 
 
-{ TForm1 }
+{ TMainForm }
 
 procedure DebugString(aMemo : TMemo; Str : string; Info:string  = '');
 var
@@ -90,7 +94,7 @@ begin
   aMemo.Append(Info + IntToStr(length(Str))+'<' + Hstr + '>');
 end;
 
-procedure TForm1.SerialFakeRxData(Sender: TObject);
+procedure TMainForm.SerialFakeRxData(Sender: TObject);
 var
   Str, Hstr : string;
   i: Integer;
@@ -102,7 +106,7 @@ begin
     FTempStr:= '';
 end;
 
-procedure TForm1.BuConnectClick(Sender: TObject);
+procedure TMainForm.BuConnectClick(Sender: TObject);
 begin
   SerialFake.Device:= EdSerialPort.Text;
   SerialFake.BaudRate:= br__9600;
@@ -113,12 +117,17 @@ begin
   Memo.Clear;
 end;
 
-procedure TForm1.BuDisconnectClick(Sender: TObject);
+procedure TMainForm.ActQuitExecute(Sender: TObject);
+begin
+  close;
+end;
+
+procedure TMainForm.BuDisconnectClick(Sender: TObject);
 begin
   SerialFake.Close;
 end;
 
-procedure TForm1.BuTestClick(Sender: TObject);
+procedure TMainForm.BuTestClick(Sender: TObject);
 var
   SendData : string;
 begin
@@ -127,7 +136,7 @@ begin
   SerialFake.WriteData(SendData);
 end;
 
-procedure TForm1.FormActivate(Sender: TObject);
+procedure TMainForm.FormActivate(Sender: TObject);
 begin
   if not FInit then begin
     if CBAutoCon.Checked then
@@ -136,32 +145,33 @@ begin
   end;
 end;
 
-procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
 
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TMainForm.FormCreate(Sender: TObject);
 begin
   FInit := false;
+  if (EdSerialPort.Text = '') then
   {$ifdef RasPi}
-  EdSerialPort.Text:= '/dev/ttyUSB0';
+    EdSerialPort.Text:= '/dev/ttyUSB0';
   {$else}
-  EdSerialPort.Text:= 'com3';
+    EdSerialPort.Text:= 'com3';
   {$endif}
 end;
 
-procedure TForm1.FormDestroy(Sender: TObject);
+procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   BuDisconnectClick(nil);
 end;
 
-procedure TForm1.PCChange(Sender: TObject);
+procedure TMainForm.PCChange(Sender: TObject);
 begin
 
 end;
 
-procedure TForm1.SerialFakeStatus(Sender: TObject; Reason: THookSerialReason;
+procedure TMainForm.SerialFakeStatus(Sender: TObject; Reason: THookSerialReason;
   const Value: string);
 begin
   case Reason of
@@ -176,12 +186,12 @@ begin
 
 end;
 
-procedure TForm1.TBRPMChange(Sender: TObject);
+procedure TMainForm.TBRPMChange(Sender: TObject);
 begin
   LEDRPM.Caption:= IntToStr(TBRPM.Position);
 end;
 
-function TForm1.AnalyseTrames(Frame: string): boolean;
+function TMainForm.AnalyseTrames(Frame: string): boolean;
 var
   CurPos : integer;
   Temp : char;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectGroup FileVersion="1">
-    <Targets Count="2">
-      <Target0 FileName="DaumErgo\fakeergo.lpi">
+    <Targets Count="3">
+      <Target0 FileName="DaumErgo\fakeDaumErgo.lpi">
         <BuildModes Count="1"/>
         <Mode1 Name="Default"/>
       </Target0>
@@ -10,6 +10,10 @@
         <BuildModes Count="1"/>
         <Mode1 Name="Default"/>
       </Target1>
+      <Target2 FileName="DaumErgo\fakeergo.lpi">
+        <BuildModes Count="1"/>
+        <Mode1 Name="Default"/>
+      </Target2>
     </Targets>
   </ProjectGroup>
 </CONFIG>
