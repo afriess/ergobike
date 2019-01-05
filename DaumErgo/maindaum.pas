@@ -1,4 +1,4 @@
-unit main;
+unit mainDaum;
 
 {$mode objfpc}{$H+}
 
@@ -23,42 +23,28 @@ type
     BuConnect: TButton;
     BuDisconnect: TButton;
     BuTest: TButton;
-    BUSpeedCalcTest: TButton;
-    BuPowerCalcTest: TButton;
+    CBAutoCon: TCheckBox;
     EdGear1: TSpinEdit;
+    EdSerialPort: TEdit;
     ImageList: TImageList;
     LblGearH1: TLabel;
-    lblRPMH: TLabel;
     lblRPMH1: TLabel;
-    lblSlopeH: TLabel;
     lblWattH1: TLabel;
-    LblWatt: TLabel;
-    LblWattH: TLabel;
-    LblSpeed: TLabel;
-    LblSpeedH: TLabel;
-    LblGearH: TLabel;
+    LEDRPM: TLEDNumber;
     LEDWatt: TLEDNumber;
     Memo: TMemo;
-    MemoInfo1: TMemo;
     KnobWatt: TmKnob;
     PC: TPageControl;
     SerialFake: TLazSerial;
-    EdGear: TSpinEdit;
     StatusBar1: TStatusBar;
-    TBRPMTest: TTrackBar;
-    TBSlopeTest: TTrackBar;
-    TS_Tests: TTabSheet;
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
     TS_Serial: TTabSheet;
     TS_Msg: TTabSheet;
     TS_Ergo: TTabSheet;
-    TBWatt: TTrackBar;
     TBRPM: TTrackBar;
     procedure BuConnectClick(Sender: TObject);
     procedure BuDisconnectClick(Sender: TObject);
-    procedure BuPowerCalcTestClick(Sender: TObject);
-    procedure BUSpeedCalcTestClick(Sender: TObject);
     procedure BuTestClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -68,7 +54,7 @@ type
     procedure SerialFakeRxData(Sender: TObject);
     procedure SerialFakeStatus(Sender: TObject; Reason: THookSerialReason;
       const Value: string);
-    procedure TBRPMTestChange(Sender: TObject);
+    procedure TBRPMChange(Sender: TObject);
   private
     FInit : Boolean;
     function AnalyseTrames(Frame : string):boolean;
@@ -118,11 +104,7 @@ end;
 
 procedure TForm1.BuConnectClick(Sender: TObject);
 begin
-  {$ifdef RasPi}
-  SerialFake.Device:= '/dev/ttyUSB0';
-  {$else}
-  SerialFake.Device:= 'com3';
-  {$endif}
+  SerialFake.Device:= EdSerialPort.Text;
   SerialFake.BaudRate:= br__9600;
   SerialFake.DataBits:= db8bits;
   SerialFake.StopBits:= sbOne;
@@ -134,74 +116,6 @@ end;
 procedure TForm1.BuDisconnectClick(Sender: TObject);
 begin
   SerialFake.Close;
-end;
-
-procedure TForm1.BuPowerCalcTestClick(Sender: TObject);
-Var
-  afCD, afSin, afCDBike, afAFrame, afCATireV, afCATireH, afLoadV,
-    afCCr, afCM,  hRider, M, MBik,
-    T, Hn, cad, cCad, W, P, V,  cwaRider, aTireV, aTireH, vw,
-    CwaBike, vw1, Ka, CrEff, CrV, CrH, Frg: Extended;
-  Slope, adipos, CrDyn: ValReal;
-  Slope10: integer;
-begin
-  Slope10 := TBSlopeTest.Position;    // 15 = 1.5 %
-  cCad := 0.002; // fixwert ?!
-  //
-  afCD := 0.79;
-  afSin := 0.85;
-  afCDBike := 1.5;
-  afAFrame := 0.052;
-  afCATireV := 1.1;
-  afCATireH := 0.9;
-  afLoadV := 0.45;
-  afCCr:= 1.0;
-  afCM := 1.025;
-  aTireV := 0.055;     // Tabelle Reifen
-  aTireH := 0.055;     // Tabelle Reifen
-  CrV     := 0.0046;    // Tabelle Reifen
-  CrH := CrV;
-  //
-  hRider:=   1.72; // f.h   Größe Fahrer in m
-  M     :=  71.3;  // f.M   Gewicht Fahrer in kg
-  MBik  :=  12.0;  // f.mr  Gewicht Fahrrad in kg
-  T     :=  20.0;  // f.T   Luft Temperatur in Grad Celisius
-  Hn    := 350.0;  // f.Hn  Höhe über NN in m
-  Slope := ArcTan((Slope10 * 0.1) * 0.01); // f.stg Steigung in Prozent
-  W  := 0.0;       // f.W  Windgeschwindigkeit in km/h
-  P  := 0.0;       // f.P  Leistung in W (<- wird gesucht !!)
-  V := 0.0;
-  TryStrToFloat(LblSpeed.caption,V); // f.V  Geschwindigeit
-  V := V * 0.27778;
-  cad := 50.0; // Cadence - Trittfrequenz pro / min
-  //
-  adipos := Sqrt(M/(hRider * 750));
-  CrDyn := 0.1 * cos(Slope);
-
-  CwaBike := afCDBike * (afCATireV * ATireV + afCATireH * ATireH + afAFrame);
-
-  CrEff := afLoadV * afCCr * CrV + (1.0 -afLoadV) * CrH;
-  Frg := 9.81 * (Mbik + M) * (CrEff * cos(Slope) + sin(slope));
-  //
-  vw := V+W;
-  vw1 := vw;
-  cwaRider := ( 1 + cad * cCad) * afCD * adipos * ((( hRider - adipos) * afSin) + adipos);
-  Ka := 176.5 * exp(-Hn * 0.0001253) * (cwaRider + CwaBike) / (273 + T);
-  //
-
-  P := afCM * V * (Ka * (vw * vw1) + Frg + V * CrDyn);;
-  LblWatt.Caption:= FloatToStr(P);
-end;
-
-procedure TForm1.BUSpeedCalcTestClick(Sender: TObject);
-var
-  Ratio,DistCm : Single;
-  Gear : Integer;
-begin
-  Gear := EdGear.Value;
-  Ratio := 1.75 + ( Gear - 1) * 0.098767;
-  DistCm:= Ratio * 210.0;
-  LblSpeed.caption := FloatToStr(TBRPMTest.Position * DistCm * 0.0006);
 end;
 
 procedure TForm1.BuTestClick(Sender: TObject);
@@ -216,7 +130,8 @@ end;
 procedure TForm1.FormActivate(Sender: TObject);
 begin
   if not FInit then begin
-    BuConnectClick(nil);
+    if CBAutoCon.Checked then
+      BuConnectClick(nil);
     FInit:= true;
   end;
 end;
@@ -229,6 +144,11 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   FInit := false;
+  {$ifdef RasPi}
+  EdSerialPort.Text:= '/dev/ttyUSB0';
+  {$else}
+  EdSerialPort.Text:= 'com3';
+  {$endif}
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -256,9 +176,9 @@ begin
 
 end;
 
-procedure TForm1.TBRPMTestChange(Sender: TObject);
+procedure TForm1.TBRPMChange(Sender: TObject);
 begin
-
+  LEDRPM.Caption:= IntToStr(TBRPM.Position);
 end;
 
 function TForm1.AnalyseTrames(Frame: string): boolean;
