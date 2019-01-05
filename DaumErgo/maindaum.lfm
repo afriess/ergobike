@@ -1,15 +1,16 @@
-object Form1: TForm1
+object MainForm: TMainForm
   Left = 1520
   Height = 517
   Top = 36
   Width = 593
-  Caption = 'Form1'
+  Caption = 'Daum Simulator'
   ClientHeight = 517
   ClientWidth = 593
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poDefault
+  SessionProperties = 'CBAutoCon.Checked;EdGear1.Value;EdSerialPort.Text;Position;TBRPM.Position;Width;Height'
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
@@ -19,7 +20,7 @@ object Form1: TForm1
   end
   object PC: TPageControl
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = ToolBar1
+    AnchorSideTop.Control = ToolBar
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
@@ -28,9 +29,9 @@ object Form1: TForm1
     Height = 468
     Top = 26
     Width = 593
-    ActivePage = TS_Ergo
+    ActivePage = TS_Serial
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 1
     TabPosition = tpBottom
     OnChange = PCChange
@@ -151,8 +152,8 @@ object Form1: TForm1
     end
     object TS_Msg: TTabSheet
       Caption = 'Messages'
-      ClientHeight = 439
-      ClientWidth = 590
+      ClientHeight = 440
+      ClientWidth = 585
       object Memo: TMemo
         AnchorSideLeft.Control = TS_Msg
         AnchorSideTop.Control = TS_Msg
@@ -161,9 +162,9 @@ object Form1: TForm1
         AnchorSideBottom.Control = TS_Msg
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 439
+        Height = 440
         Top = 0
-        Width = 590
+        Width = 585
         Anchors = [akTop, akLeft, akRight, akBottom]
         Lines.Strings = (
           'Memo'
@@ -173,8 +174,8 @@ object Form1: TForm1
     end
     object TS_Serial: TTabSheet
       Caption = 'Serial'
-      ClientHeight = 439
-      ClientWidth = 590
+      ClientHeight = 440
+      ClientWidth = 585
       object BuConnect: TButton
         AnchorSideLeft.Control = TS_Serial
         AnchorSideTop.Control = TS_Serial
@@ -225,7 +226,7 @@ object Form1: TForm1
         Width = 80
         BorderSpacing.Left = 20
         TabOrder = 3
-        Text = 'Port'
+        TextHint = 'Com Port'
       end
       object CBAutoCon: TCheckBox
         AnchorSideLeft.Control = EdSerialPort
@@ -244,17 +245,18 @@ object Form1: TForm1
       end
     end
   end
-  object ToolBar1: TToolBar
+  object ToolBar: TToolBar
     Left = 0
     Height = 26
     Top = 0
     Width = 593
-    Caption = 'ToolBar1'
+    Caption = 'ToolBar'
+    Images = ImageList
     TabOrder = 2
     object ToolButton1: TToolButton
       Left = 1
       Top = 2
-      Caption = 'ToolButton1'
+      Action = ActQuit
     end
   end
   object SerialFake: TLazSerial
@@ -275,9 +277,18 @@ object Form1: TForm1
     Images = ImageList
     Left = 413
     Top = 16
+    object ActQuit: TAction
+      Caption = 'Quit'
+      OnExecute = ActQuitExecute
+    end
   end
   object ImageList: TImageList
     Left = 413
     Top = 80
+  end
+  object XMLPropStorage1: TXMLPropStorage
+    StoredValues = <>
+    Left = 80
+    Top = 108
   end
 end
