@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls,
-  ExtCtrls, ActnList, Spin, LazSerial, LazSynaSer;
+  ExtCtrls, ActnList, Spin, LazSerial, LazSynaSer, MKnob, LedNumber;
 
 
 const
@@ -37,8 +37,10 @@ type
     LblSpeed: TLabel;
     LblSpeedH: TLabel;
     LblGearH: TLabel;
+    LEDWatt: TLEDNumber;
     Memo: TMemo;
     MemoInfo1: TMemo;
+    KnobWatt: TmKnob;
     PC: TPageControl;
     SerialFake: TLazSerial;
     EdGear: TSpinEdit;
@@ -388,7 +390,9 @@ begin
     if length(frame) < 3 then
       result := true           // weitere zeichen anfordern
     else begin
-      TBWatt.Position := Ord(Frame[3]) * 5;
+      //TBWatt.Position :=
+      KnobWatt.Position:= Ord(Frame[3]) * 5;
+      LEDWatt.Caption:= IntToStr(KnobWatt.Position);
       FTempStr := '';
       SendData:= #$51+DevAdr+Frame[3];
       DebugString(Memo,SendData,'Set Power Answ-');
@@ -414,7 +418,8 @@ begin
       result := true           // weitere zeichen anfordern
     else begin
       FTempStr := '';
-      watt := TBWatt.Position div 5;
+      //watt := TBWatt.Position div 5;
+      watt := KnobWatt.Position div 5;
       RPM := TBRPM.Position;
       if (Watt < 5) then watt := 5;
       if (Watt > 80) then Watt := 80;
