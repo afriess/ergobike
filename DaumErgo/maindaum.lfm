@@ -29,9 +29,9 @@ object MainForm: TMainForm
     Height = 468
     Top = 26
     Width = 593
-    ActivePage = TS_Serial
+    ActivePage = TS_Ergo
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 1
     TabPosition = tpBottom
     OnChange = PCChange
@@ -134,7 +134,7 @@ object MainForm: TMainForm
         AnchorSideTop.Side = asrBottom
         Left = 258
         Height = 32
-        Top = 217
+        Top = 212
         Width = 56
         Caption = '000'
       end

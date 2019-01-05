@@ -3,8 +3,9 @@
   <ProjectGroup FileVersion="1">
     <Targets Count="3">
       <Target0 FileName="DaumErgo\fakeDaumErgo.lpi">
-        <BuildModes Count="1"/>
-        <Mode1 Name="Default"/>
+        <BuildModes Count="2"/>
+        <Mode1 Name="Debug"/>
+        <Mode2 Name="Release" Compile="True"/>
       </Target0>
       <Target1 FileName="KettlerErgo\FakeKettlerErgo.lpi">
         <BuildModes Count="1"/>
