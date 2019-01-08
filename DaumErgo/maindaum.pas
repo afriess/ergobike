@@ -15,6 +15,16 @@ const
   Treten =  #$01;
   NTreten=  #$00;
 
+  // Cockpittypen Classic Line
+  CockpitUnknown = 0;
+  CockpitCardio  = 10;    // $0A
+  CockpitFitness = 20;    // $14
+  CockpitVitaDeLuxe = 30; // $1E
+  Cockpit8008    = 40;    // $28
+  Cockpit8080    = 50;    // $32
+  CockpitTherapiy = 60;   // $3C
+
+
 type
 
   { TMainForm }
@@ -61,6 +71,7 @@ type
     procedure TBRPMChange(Sender: TObject);
   private
     FInit : Boolean;
+    AktPrg : byte;
     function AnalyseTrames(Frame : string):boolean;
 
   public
@@ -211,6 +222,7 @@ begin
   //  $64        : Set date
   //  $62        : SetTime
   //  $d3        ; Play Sound
+  // 130 $82     : Get Config         -> $82 byte2 16bytesdata
   if length(frame) = 0 then
     exit; //==>> nichts zu tun
   if (ord(Frame[1]) = $12) then begin
@@ -260,7 +272,7 @@ begin
     else begin
       FTempStr := '';
       sleep(10);
-      SendData:= #$73+DevAdr+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$1E;
+      SendData:= #$73+#$02+#$03+#$04+#$05+#$06+#$07+#$08+#$09+#$1E+#$00;
       DebugString(Memo,SendData,'Get Version Answ-');
       SerialFake.WriteData(SendData);
     end;
@@ -271,10 +283,23 @@ begin
     if length(frame) < 3 then
       result := true           // weitere zeichen anfordern
     else begin
+      AktPrg:= ord(Frame[3]);
+      FTempStr := '';
+      SendData:= #$23+DevAdr+Chr(AktPrg)+NTreten;
+      DebugString(Memo,SendData,'Set Prog Ans-');
+      SerialFake.WriteData(SendData);
+    end;
+  end
+  else if (ord(Frame[1]) = $24) then begin
+    // Set Person
+    Memo.Append('Set Pers Req');
+    if length(frame) < 15 then
+      result := true           // weitere zeichen anfordern
+    else begin
       Temp:= Frame[3];
       FTempStr := '';
-      SendData:= #$23+DevAdr+Temp+NTreten;
-      DebugString(Memo,SendData,'Set Prog Ans-');
+      SendData:= Frame;// #$24+DevAdr+Chr(AktPrg);
+      DebugString(Memo,SendData,'Set Pers Ans-');
       SerialFake.WriteData(SendData);
     end;
   end
@@ -341,6 +366,30 @@ begin
       SerialFake.WriteData(SendData);
     end;
   end
+  else if (ord(Frame[1]) = $37)  then begin
+    // Get Config
+    Memo.Append('Get Config Req');
+    if length(frame) < 10 then
+      result := true           // weitere zeichen anfordern
+    else begin
+      FTempStr := '';
+      SendData:= #$37+DevAdr+#$09+#$08+#$07+#$06+#$05+#$04+#$03+#$02+#$01;
+      DebugString(Memo,SendData,'Set Config Answ-');
+      SerialFake.WriteData(SendData);
+    end;
+  end
+  //else if (ord(Frame[1]) = $37)  then begin
+  //  // Get Config
+  //  Memo.Append('Get Config Req');
+  //  if length(frame) < 18 then
+  //    result := true           // weitere zeichen anfordern
+  //  else begin
+  //    FTempStr := '';
+  //    SendData:= #$37+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00;
+  //    DebugString(Memo,SendData,'Set Config Answ-');
+  //    SerialFake.WriteData(SendData);
+  //  end;
+  //end
   else if (ord(Frame[1]) = $40)  then begin
     // Stop Prg
     Memo.Append('Query Run Data Req');

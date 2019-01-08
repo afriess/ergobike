@@ -37,8 +37,8 @@ object MainForm: TMainForm
     OnChange = PCChange
     object TS_Ergo: TTabSheet
       Caption = 'Ergo'
-      ClientHeight = 440
-      ClientWidth = 585
+      ClientHeight = 433
+      ClientWidth = 583
       object TBRPM: TTrackBar
         AnchorSideLeft.Control = LEDRPM
         AnchorSideLeft.Side = asrBottom
@@ -49,8 +49,8 @@ object MainForm: TMainForm
         AnchorSideBottom.Side = asrBottom
         Left = 106
         Height = 51
-        Top = 389
-        Width = 479
+        Top = 382
+        Width = 477
         Max = 199
         OnChange = TBRPMChange
         Position = 0
@@ -64,7 +64,7 @@ object MainForm: TMainForm
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 15
-        Top = 407
+        Top = 400
         Width = 48
         AutoSize = False
         Caption = 'RPM'
@@ -73,7 +73,7 @@ object MainForm: TMainForm
       object lblWattH1: TLabel
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Side = asrBottom
-        Left = 270
+        Left = 269
         Height = 15
         Top = 8
         Width = 32
@@ -86,9 +86,9 @@ object MainForm: TMainForm
         AnchorSideLeft.Control = TS_Ergo
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 15
-        Top = 236
-        Width = 63
+        Height = 21
+        Top = 229
+        Width = 85
         Anchors = [akLeft]
         BorderSpacing.Bottom = 10
         Caption = 'Gear (Gang)'
@@ -101,9 +101,9 @@ object MainForm: TMainForm
         AnchorSideRight.Control = LblGearH1
         AnchorSideRight.Side = asrBottom
         Left = 10
-        Height = 23
-        Top = 261
-        Width = 43
+        Height = 33
+        Top = 260
+        Width = 65
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Left = 10
         BorderSpacing.Right = 10
@@ -117,7 +117,7 @@ object MainForm: TMainForm
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Control = lblWattH1
         AnchorSideTop.Side = asrBottom
-        Left = 190
+        Left = 189
         Height = 184
         Top = 28
         Width = 192
@@ -132,7 +132,7 @@ object MainForm: TMainForm
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Control = KnobWatt
         AnchorSideTop.Side = asrBottom
-        Left = 258
+        Left = 257
         Height = 32
         Top = 212
         Width = 56
@@ -145,15 +145,15 @@ object MainForm: TMainForm
         AnchorSideTop.Side = asrCenter
         Left = 48
         Height = 34
-        Top = 397
+        Top = 390
         Width = 58
         Caption = '000'
       end
     end
     object TS_Msg: TTabSheet
       Caption = 'Messages'
-      ClientHeight = 440
-      ClientWidth = 585
+      ClientHeight = 433
+      ClientWidth = 583
       object Memo: TMemo
         AnchorSideLeft.Control = TS_Msg
         AnchorSideTop.Control = TS_Msg
@@ -174,8 +174,8 @@ object MainForm: TMainForm
     end
     object TS_Serial: TTabSheet
       Caption = 'Serial'
-      ClientHeight = 440
-      ClientWidth = 585
+      ClientHeight = 433
+      ClientWidth = 583
       object BuConnect: TButton
         AnchorSideLeft.Control = TS_Serial
         AnchorSideTop.Control = TS_Serial
