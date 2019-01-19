@@ -14,9 +14,13 @@ type
   TForm1 = class(TForm)
     BuGetIP: TButton;
     BuGetIPList: TButton;
+    BuGetIPSyna: TButton;
+    BuGetInetsocket: TButton;
     Memo1: TMemo;
+    procedure BuGetInetsocketClick(Sender: TObject);
     procedure BuGetIPClick(Sender: TObject);
     procedure BuGetIPListClick(Sender: TObject);
+    procedure BuGetIPSynaClick(Sender: TObject);
   private
 
   public
@@ -29,7 +33,7 @@ var
 implementation
 
 uses
-  Process;
+  Process, synamisc, sockets, ssockets;
 
 {$R *.lfm}
 
@@ -119,7 +123,25 @@ procedure TForm1.BuGetIPClick(Sender: TObject);
 var
   str : String;
 begin
+  Memo1.Append('--- GetIPAddress (with hostname)---');
   str := GetIPAddress;
+  Memo1.Append(str);
+end;
+
+procedure TForm1.BuGetInetsocketClick(Sender: TObject);
+var
+  c: TInetSocket;
+  str : String;
+
+begin
+  //catch ESocketError (seHostNotFound or seConnectFailed) if you care
+  Memo1.Append('--- GetIpAddrList (with TInetSocket)---');
+  try
+    c := TInetSocket.Create('192.168.1.1',80);
+    str := NetAddrToStr(c.LocalAddress.sin_addr);
+  finally
+    c.Free;
+  end;
   Memo1.Append(str);
 end;
 
@@ -127,7 +149,17 @@ procedure TForm1.BuGetIPListClick(Sender: TObject);
 var
   str : String;
 begin
+  Memo1.Append('--- GetIpAddrList (with ifconfig)---');
   str := GetIpAddrList;
+  Memo1.Append(str);
+end;
+
+procedure TForm1.BuGetIPSynaClick(Sender: TObject);
+var
+  str : String;
+begin
+  Memo1.Append('--- Synase GetLocalIPs ---');
+  str := GetLocalIPs;
   Memo1.Append(str);
 end;
 

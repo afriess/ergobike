@@ -34,4 +34,22 @@ object Form1: TForm1
     OnClick = BuGetIPListClick
     TabOrder = 2
   end
+  object BuGetIPSyna: TButton
+    Left = 280
+    Height = 33
+    Top = 8
+    Width = 113
+    Caption = 'Get IP Synapse'
+    OnClick = BuGetIPSynaClick
+    TabOrder = 3
+  end
+  object BuGetInetsocket: TButton
+    Left = 408
+    Height = 33
+    Top = 8
+    Width = 113
+    Caption = 'Get IP InetSocket'
+    OnClick = BuGetInetsocketClick
+    TabOrder = 4
+  end
 end
