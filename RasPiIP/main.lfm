@@ -1,0 +1,37 @@
+object Form1: TForm1
+  Left = 339
+  Height = 398
+  Top = 36
+  Width = 584
+  Caption = 'Form1'
+  ClientHeight = 398
+  ClientWidth = 584
+  object BuGetIP: TButton
+    Left = 8
+    Height = 33
+    Top = 8
+    Width = 113
+    Caption = 'Get IP'
+    OnClick = BuGetIPClick
+    TabOrder = 0
+  end
+  object Memo1: TMemo
+    Left = 8
+    Height = 312
+    Top = 48
+    Width = 440
+    Lines.Strings = (
+      'Memo1'
+    )
+    TabOrder = 1
+  end
+  object BuGetIPList: TButton
+    Left = 144
+    Height = 33
+    Top = 8
+    Width = 113
+    Caption = 'Get IP List'
+    OnClick = BuGetIPListClick
+    TabOrder = 2
+  end
+end
