@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls,
-  ExtCtrls, ActnList, Spin, XMLPropStorage, IDEWindowIntf, LazSerial,
+  ExtCtrls, ActnList, Spin, XMLPropStorage, ValEdit, IDEWindowIntf, LazSerial,
   LazSynaSer, MKnob, LedNumber;
 
 
@@ -27,6 +27,24 @@ const
 
 type
 
+  TPerson = record
+    Num,
+    Age,
+    Sex,
+    Height,
+    Weight,
+    Fat,
+    CoachGrade,
+    CoachFreq,
+    MaxWatt,
+    MaxPulse,
+    MaxTime,
+    MaxDist,
+    MaxCal : Byte;
+  end;
+
+  TPersonArr = array[0..4] of TPerson;
+
   { TMainForm }
 
   TMainForm = class(TForm)
@@ -39,22 +57,28 @@ type
     EdGear1: TSpinEdit;
     EdSerialPort: TEdit;
     ImageList: TImageList;
+    LblSlope: TLabel;
     LblGearH1: TLabel;
     lblRPMH1: TLabel;
+    LblSpeed: TLabel;
     lblWattH1: TLabel;
     LEDRPM: TLEDNumber;
+    LEDSpeed: TLEDNumber;
     LEDWatt: TLEDNumber;
+    LEDSlope: TLEDNumber;
     Memo: TMemo;
     KnobWatt: TmKnob;
     PC: TPageControl;
     SerialFake: TLazSerial;
     StatusBar1: TStatusBar;
+    Timer1: TTimer;
     ToolBar: TToolBar;
     ToolButton1: TToolButton;
     TS_Serial: TTabSheet;
     TS_Msg: TTabSheet;
     TS_Ergo: TTabSheet;
     TBRPM: TTrackBar;
+    VLEPerson: TValueListEditor;
     XMLPropStorage1: TXMLPropStorage;
     procedure ActQuitExecute(Sender: TObject);
     procedure BuConnectClick(Sender: TObject);
@@ -69,11 +93,28 @@ type
     procedure SerialFakeStatus(Sender: TObject; Reason: THookSerialReason;
       const Value: string);
     procedure TBRPMChange(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
     FInit : Boolean;
-    AktPrg : byte;
+    //
+    Personen : TPersonArr;
+    AktPers,                 // actual person
+    AktPrg,                  // actual prg
+    Tret,                    // 0=Stop 1=Cycling
+    BikeType: Byte;          // GearTyp 0=Roadbike,1=MountainBike
+    Dist1,
+    Dist2,
+    Time1,
+    Time2 : byte;
+    //
+    Gear, RPM, Spd : integer;
+    Slope : single;
+    TimeRun, TimeDiff, AktTime, LastTime : QWord;
+    DistanceRun: double;
     function AnalyseTrames(Frame : string):boolean;
-
+    procedure AnzPersonValues(APerson : TPerson);
+    procedure ResetPrg;
+    function BytesToSingle(B1,B2,B3,B4: Byte):single;
   public
 
   end;
@@ -150,10 +191,20 @@ end;
 procedure TMainForm.FormActivate(Sender: TObject);
 begin
   if not FInit then begin
+    // default values
+    Slope:= 0.0;
+    Spd:= 0;
+    RPM:= 0;
+
+    LastTime := GetTickCount64; // get Time in ms
+    // AutoConnect
     if CBAutoCon.Checked then
       BuConnectClick(nil);
+    // Start processing
+    Timer1.Enabled:= true;
     FInit:= true;
   end;
+
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -202,12 +253,62 @@ begin
   LEDRPM.Caption:= IntToStr(TBRPM.Position);
 end;
 
+procedure TMainForm.Timer1Timer(Sender: TObject);
+var
+  DeltaTime : Qword;
+  Geschw_ms, Distance : double;
+begin
+  Timer1.Enabled:= false;
+  try
+    AktTime := GetTickCount64; // get Time in ms
+    RPM := TBRPM.Position;
+    Gear := EdGear1.Value;
+    // Check if spinning
+    if (RPM >= 5) then begin
+      // We are cycling
+      Tret:= 1;
+      // Calculate Speed
+      Spd := round (RPM * ((1.75 + (Gear - 1) * 0.098767) * 210.0) * 0.0006);
+
+      DeltaTime:= AktTime - LastTime; // Delta in ms
+      TimeRun := TimeRun + DeltaTime;  // Runtime in ms
+
+      // Calculate distance
+      Geschw_ms := RPM * ((1.75 + (Gear - 1) * 0.098767) * 210.0) * 0.0006 * 3.6; // Speed meter per second
+      Distance := (Deltatime/1000{sec}) * Geschw_ms{m/sec};
+
+      DistanceRun:= DistanceRun + Distance; // in meter
+
+      // Show
+      LEDSpeed.Caption:= Spd.ToString;
+
+      // Calc for Bike
+      Dist1 := round(DistanceRun / 1000.0) and $FF;               // in 100 m parts
+      Dist2 := (round(DistanceRun / 1000.0) shr 8) and $FF;
+
+      Time1 :=  round(TimeRun / 1000.0) and $FF;                   // in second
+      Time2 :=  (round(TimeRun / 1000.0)shr 8) and $FF;
+
+    end
+    else begin
+      // We stopped
+      Tret:= 0;
+      Spd := 0;
+    end;
+    LastTime:= AktTime;
+
+  finally
+    Timer1.Enabled:= True;
+  end;
+end;
+
 function TMainForm.AnalyseTrames(Frame: string): boolean;
 var
   CurPos : integer;
   Temp : char;
+  TempB : Byte;
   SendData : string;
-  Watt,RPM,Tret, spd : integer;
+  Watt : integer;
 begin
   Result := false;
   // Daum defintion
@@ -292,15 +393,34 @@ begin
   end
   else if (ord(Frame[1]) = $24) then begin
     // Set Person
-    Memo.Append('Set Pers Req');
+    Memo.Append('Set Person Req');
     if length(frame) < 15 then
       result := true           // weitere zeichen anfordern
     else begin
-      Temp:= Frame[3];
+      TempB := ord(Frame[3]);
+      AktPers:= TempB;
+      if ((TempB >= Low(Personen)) and (TempB <= High(Personen))) then begin
+        with Personen[TempB] do begin
+          Num         := TempB;
+          Age         := ord(Frame[4]);
+          Sex         := ord(Frame[5]);
+          Height      := ord(Frame[6]);
+          Weight      := ord(Frame[7]);
+          Fat         := ord(Frame[8]);
+          CoachGrade  := ord(Frame[9]);
+          CoachFreq   := ord(Frame[10]);
+          MaxWatt     := ord(Frame[11]);
+          MaxPulse    := ord(Frame[12]);
+          MaxTime     := ord(Frame[13]);
+          MaxDist     := ord(Frame[14]);
+          MaxCal      := ord(Frame[15]);
+        end;
+      end;
       FTempStr := '';
-      SendData:= Frame;// #$24+DevAdr+Chr(AktPrg);
-      DebugString(Memo,SendData,'Set Pers Ans-');
+      SendData:= Frame+NTreten;// #$24+DevAdr+Chr(AktPrg);
+      DebugString(Memo,SendData,'Set Person Ans-');
       SerialFake.WriteData(SendData);
+      AnzPersonValues(Personen[TempB]);
     end;
   end
   else if (ord(Frame[1]) = $21) then begin
@@ -313,6 +433,7 @@ begin
       SendData:= #$21+DevAdr+NTreten;
       DebugString(Memo,SendData,'Start Prog Answ-');
       SerialFake.WriteData(SendData);
+      ResetPrg;
     end;
   end
   else if (ord(Frame[1]) = $22)  then begin
@@ -327,15 +448,33 @@ begin
       SerialFake.WriteData(SendData);
     end;
   end
-  else if (ord(Frame[1]) = $62)  then begin
-    // Set Date
-    Memo.Append('Set Date Req');
+  else if (ord(Frame[1]) = $37)  then begin
+    // Get Config
+    Memo.Append('Get Config Req');
+    if length(frame) < 10 then
+      result := true           // weitere zeichen anfordern
+    else begin
+      FTempStr := '';
+      SendData:= #$37+DevAdr+#$09+#$08+#$07+#$06+#$05+#$04+#$03+#$02+#$01;
+      DebugString(Memo,SendData,'Set Config Answ-');
+      SerialFake.WriteData(SendData);
+    end;
+  end
+  else if (ord(Frame[1]) = $40)  then begin
+    // Stop Prg
+    Memo.Append('Query Run Data Req');
     if length(frame) < 2 then
       result := true           // weitere zeichen anfordern
     else begin
       FTempStr := '';
-      SendData:= #$62+DevAdr;
-      DebugString(Memo,SendData,'Set Date Answ-');
+      //watt := TBWatt.Position div 5;
+      watt := KnobWatt.Position div 5;
+      RPM := TBRPM.Position;
+      if (Watt < 5) then watt := 5;
+      if (Watt > 80) then Watt := 80;
+      //                         PRG         PERS         Treten       Watt       RPM     spd            Dist                   Tretzeit         joule      puls  zust  gang  relJoule
+      SendData:= #$40+DevAdr+char(AktPrg)+char(AktPers)+char(Tret)+char(watt)+char(RPM)+char(spd)+char(Dist1)+char(Dist2)+char(Time1)+char(Time2)+ #$00+#$00+ #$30+ #$00+ #$00+ #$00+#$00;
+      DebugString(Memo,SendData,'Suery Run Data Answ-');
       SerialFake.WriteData(SendData);
     end;
   end
@@ -354,6 +493,46 @@ begin
       SerialFake.WriteData(SendData);
     end;
   end
+  else if (ord(Frame[1]) = $53)  then begin
+    // Set Power
+    Memo.Append('Set Gang Req');
+    if length(frame) < 3 then
+      result := true           // weitere zeichen anfordern
+    else begin
+      //TBWatt.Position :=
+      EdGear1.Value:= Ord(Frame[3]);
+      FTempStr := '';
+      SendData:= #$53+DevAdr+Frame[3];
+      DebugString(Memo,SendData,'Set Gang Answ-');
+      SerialFake.WriteData(SendData);
+    end;
+  end
+  else if (ord(Frame[1]) = $55)  then begin
+    // Set Power
+    Memo.Append('Set Slope Req');
+    if length(frame) < 6 then
+      result := true           // weitere zeichen anfordern
+    else begin
+      Slope:= BytesToSingle(ord(Frame[5]),ord(Frame[4]),ord(Frame[3]),ord(Frame[2])) / 10.0;
+      LEDSlope.Caption:= FloatToStr(Slope);
+      FTempStr := '';
+      SendData:= #$55+DevAdr+Frame[2]+Frame[3]+Frame[4]+Frame[5];
+      DebugString(Memo,SendData,'Set Slope Answ-');
+      SerialFake.WriteData(SendData);
+    end;
+  end
+  else if (ord(Frame[1]) = $62)  then begin
+    // Set Date
+    Memo.Append('Set Date Req');
+    if length(frame) < 2 then
+      result := true           // weitere zeichen anfordern
+    else begin
+      FTempStr := '';
+      SendData:= #$62+DevAdr;
+      DebugString(Memo,SendData,'Set Date Answ-');
+      SerialFake.WriteData(SendData);
+    end;
+  end
   else if (ord(Frame[1]) = $64)  then begin
     // Stop Prg
     Memo.Append('Set Time Req');
@@ -366,53 +545,58 @@ begin
       SerialFake.WriteData(SendData);
     end;
   end
-  else if (ord(Frame[1]) = $37)  then begin
-    // Get Config
-    Memo.Append('Get Config Req');
-    if length(frame) < 10 then
+  else if (ord(Frame[1]) = $69) then begin
+    // Set Startparam
+    Memo.Append('Set Startparam Req');
+    if length(frame) < 5 then
       result := true           // weitere zeichen anfordern
     else begin
+      BikeType:= ord(Frame[4]); // GearTyp 0=Roadbike,1=MountainBike
       FTempStr := '';
-      SendData:= #$37+DevAdr+#$09+#$08+#$07+#$06+#$05+#$04+#$03+#$02+#$01;
-      DebugString(Memo,SendData,'Set Config Answ-');
-      SerialFake.WriteData(SendData);
-    end;
-  end
-  //else if (ord(Frame[1]) = $37)  then begin
-  //  // Get Config
-  //  Memo.Append('Get Config Req');
-  //  if length(frame) < 18 then
-  //    result := true           // weitere zeichen anfordern
-  //  else begin
-  //    FTempStr := '';
-  //    SendData:= #$37+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00+#$00;
-  //    DebugString(Memo,SendData,'Set Config Answ-');
-  //    SerialFake.WriteData(SendData);
-  //  end;
-  //end
-  else if (ord(Frame[1]) = $40)  then begin
-    // Stop Prg
-    Memo.Append('Query Run Data Req');
-    if length(frame) < 2 then
-      result := true           // weitere zeichen anfordern
-    else begin
-      FTempStr := '';
-      //watt := TBWatt.Position div 5;
-      watt := KnobWatt.Position div 5;
-      RPM := TBRPM.Position;
-      if (Watt < 5) then watt := 5;
-      if (Watt > 80) then Watt := 80;
-      if (RPM >= 5) then Tret:= 1
-      else Tret:= 0;
-      spd := round (RPM * ((1.75 + ( EdGear1.Value - 1) * 0.098767) * 210.0) * 0.0006);
-      //                     PRG  PERS  Treten     Watt         RPM     spd     Dist   Tretzeit    joule   puls  zust gang relJoule
-      SendData:= #$40+DevAdr+#$01+#$01+char(Tret)+char(watt)+char(RPM)+char(spd)+#$00+#$00+#$00+#$00+#$00+#$00+#$30+#$00+#$00+#$00+#$00;
-      DebugString(Memo,SendData,'Suery Run Data Answ-');
+      SendData:= Frame; // ;
+      DebugString(Memo,SendData,'Set Startparam Ans-');
       SerialFake.WriteData(SendData);
     end;
   end;
 
 
+end;
+
+procedure TMainForm.AnzPersonValues(APerson: TPerson);
+begin
+  VLEPerson.Clear;
+  VLEPerson.InsertRow('Num',Aperson.Num.ToString,true);
+  VLEPerson.InsertRow('Age',Aperson.Age.ToString,true);
+  VLEPerson.InsertRow('Sex',Aperson.Sex.ToString,true);
+  VLEPerson.InsertRow('Height',Aperson.Height .ToString,true);
+  VLEPerson.InsertRow('Weight',Aperson.Weight.ToString,true);
+  VLEPerson.InsertRow('Fat',Aperson.Fat.ToString,true);
+  VLEPerson.InsertRow('CoachGrade',Aperson.CoachGrade.ToString,true);
+  VLEPerson.InsertRow('CoachFreq',Aperson.CoachFreq.ToString,true);
+  VLEPerson.InsertRow('MaxWatt',Aperson.MaxWatt.ToString,true);
+  VLEPerson.InsertRow('MaxPulse',Aperson.MaxPulse.ToString,true);
+  VLEPerson.InsertRow('MaxTime',Aperson.MaxTime.ToString,true);
+  VLEPerson.InsertRow('MaxDist',Aperson.MaxDist.ToString,true);
+  VLEPerson.InsertRow('MaxCal',Aperson.MaxCal.ToString,true);
+end;
+
+procedure TMainForm.ResetPrg;
+begin
+  LastTime:= GetTickCount64;
+  TimeRun:= 0;
+  DistanceRun:= 0;
+end;
+
+function TMainForm.BytesToSingle(B1, B2, B3, B4: Byte): single;
+var
+  buf : array[0..3] of byte;
+  ASingle : Single absolute buf;
+begin
+  buf[0] := B1;
+  buf[1] := B2;
+  buf[2] := B3;
+  buf[3] := B4;
+  Result := ASingle;
 end;
 
 end.
