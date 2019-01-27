@@ -55,6 +55,7 @@ type
     BuTest: TButton;
     CBAutoCon: TCheckBox;
     EdGear1: TSpinEdit;
+    EdtTestOut: TEdit;
     EdSerialPort: TEdit;
     ImageList: TImageList;
     LblSlope: TLabel;
@@ -513,10 +514,11 @@ begin
     if length(frame) < 6 then
       result := true           // weitere zeichen anfordern
     else begin
-      Slope:= BytesToSingle(ord(Frame[5]),ord(Frame[4]),ord(Frame[3]),ord(Frame[2])) / 10.0;
+      Slope:= BytesToSingle(ord(Frame[3]),ord(Frame[4]),ord(Frame[5]),ord(Frame[6]));
+      EdtTestOut.Text:= Slope.ToString;
       LEDSlope.Caption:= FloatToStr(Slope);
       FTempStr := '';
-      SendData:= #$55+DevAdr+Frame[2]+Frame[3]+Frame[4]+Frame[5];
+      SendData:= #$55+DevAdr+Frame[3]+Frame[4]+Frame[5]+Frame[6];
       DebugString(Memo,SendData,'Set Slope Answ-');
       SerialFake.WriteData(SendData);
     end;

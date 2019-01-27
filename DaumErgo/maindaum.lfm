@@ -154,10 +154,10 @@ object MainForm: TMainForm
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Control = LblSlope
         AnchorSideTop.Side = asrBottom
-        Left = 33
+        Left = 90
         Height = 30
-        Top = 130
-        Width = 318
+        Top = 125
+        Width = 204
         Caption = '0000'
         Columns = 12
       end
@@ -209,6 +209,14 @@ object MainForm: TMainForm
         Width = 72
         Caption = '0000'
       end
+      object EdtTestOut: TEdit
+        Left = 96
+        Height = 33
+        Top = 336
+        Width = 376
+        TabOrder = 4
+        Text = 'EdtTestOut'
+      end
     end
     object TS_Msg: TTabSheet
       Caption = 'Messages'
@@ -224,7 +232,7 @@ object MainForm: TMainForm
         Left = 0
         Height = 433
         Top = 0
-        Width = 583
+        Width = 688
         Anchors = [akTop, akLeft, akRight, akBottom]
         Lines.Strings = (
           'Memo'
@@ -281,8 +289,8 @@ object MainForm: TMainForm
         AnchorSideTop.Control = BuDisconnect
         AnchorSideTop.Side = asrCenter
         Left = 224
-        Height = 23
-        Top = 15
+        Height = 33
+        Top = 10
         Width = 80
         BorderSpacing.Left = 20
         TabOrder = 3
@@ -294,9 +302,9 @@ object MainForm: TMainForm
         AnchorSideTop.Control = EdSerialPort
         AnchorSideTop.Side = asrCenter
         Left = 314
-        Height = 19
-        Top = 17
-        Width = 94
+        Height = 25
+        Top = 14
+        Width = 121
         BorderSpacing.Left = 10
         Caption = 'Auto Connect'
         Checked = True
