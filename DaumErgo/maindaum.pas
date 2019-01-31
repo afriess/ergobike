@@ -15,6 +15,8 @@ const
   Treten =  #$01;
   NTreten=  #$00;
 
+  DevType= #$1E;
+
   // Cockpittypen Classic Line
   CockpitUnknown = 0;
   CockpitCardio  = 10;    // $0A
@@ -333,7 +335,6 @@ begin
     if length(frame) < 2 then
       result := true           // weitere zeichen anfordern
     else begin
-      Memo.Append('');
       FTempStr := '';
       SendData:= #$12+DevAdr;
       DebugString(Memo,SendData,'Reset Dev Answ-');
@@ -374,7 +375,7 @@ begin
     else begin
       FTempStr := '';
       sleep(10);
-      SendData:= #$73+#$02+#$03+#$04+#$05+#$06+#$07+#$08+#$09+#$1E+#$00;
+      SendData:= #$73+DevAdr+#$02+#$03+#$04+#$05+#$06+#$07+#$08+#$09+DevType;
       DebugString(Memo,SendData,'Get Version Answ-');
       SerialFake.WriteData(SendData);
     end;
@@ -470,10 +471,11 @@ begin
       FTempStr := '';
       //watt := TBWatt.Position div 5;
       watt := KnobWatt.Position div 5;
+      LEDWatt.Caption := IntToStr(KnobWatt.Position);
       RPM := TBRPM.Position;
       if (Watt < 5) then watt := 5;
       if (Watt > 80) then Watt := 80;
-      //                         PRG         PERS         Treten       Watt       RPM     spd            Dist                   Tretzeit         joule      puls  zust  gang  relJoule
+      //                         PRG         PERS         Treten       Watt       RPM     spd            Dist                   Tretzeit           joule      puls  zust  gang  relJoule
       SendData:= #$40+DevAdr+char(AktPrg)+char(AktPers)+char(Tret)+char(watt)+char(RPM)+char(spd)+char(Dist1)+char(Dist2)+char(Time1)+char(Time2)+ #$00+#$00+ #$30+ #$00+ #$00+ #$00+#$00;
       DebugString(Memo,SendData,'Suery Run Data Answ-');
       SerialFake.WriteData(SendData);
