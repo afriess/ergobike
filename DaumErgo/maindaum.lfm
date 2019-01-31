@@ -117,10 +117,10 @@ object MainForm: TMainForm
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Control = lblWattH1
         AnchorSideTop.Side = asrBottom
-        Left = 240
-        Height = 184
+        Left = 268
+        Height = 108
         Top = 28
-        Width = 192
+        Width = 136
         BorderSpacing.Top = 5
         Position = 0
         MarkSize = 10
@@ -134,7 +134,7 @@ object MainForm: TMainForm
         AnchorSideTop.Side = asrBottom
         Left = 308
         Height = 32
-        Top = 212
+        Top = 136
         Width = 56
         Caption = '000'
       end
@@ -216,6 +216,48 @@ object MainForm: TMainForm
         Width = 376
         TabOrder = 4
         Text = 'EdtTestOut'
+      end
+      object LblPrg: TLabel
+        Left = 490
+        Height = 21
+        Top = 68
+        Width = 112
+        AutoSize = False
+        Caption = 'Program'
+        ParentColor = False
+      end
+      object LblPers: TLabel
+        Left = 490
+        Height = 21
+        Top = 40
+        Width = 112
+        AutoSize = False
+        Caption = 'Person'
+        ParentColor = False
+      end
+      object LEDPulse: TLEDNumber
+        AnchorSideLeft.Side = asrCenter
+        AnchorSideTop.Side = asrBottom
+        Left = 312
+        Height = 32
+        Top = 280
+        Width = 56
+        Caption = '000'
+      end
+      object KnobPulse: TmKnob
+        AnchorSideLeft.Side = asrCenter
+        AnchorSideTop.Side = asrBottom
+        Left = 280
+        Height = 96
+        Top = 176
+        Width = 112
+        BorderSpacing.Top = 5
+        Position = 60
+        MarkSize = 10
+        MarkStyle = msTriangle
+        Max = 200
+        Min = 30
+        OnChange = KnobPulseChange
       end
     end
     object TS_Msg: TTabSheet

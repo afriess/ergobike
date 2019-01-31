@@ -60,6 +60,9 @@ type
     EdtTestOut: TEdit;
     EdSerialPort: TEdit;
     ImageList: TImageList;
+    KnobPulse: TmKnob;
+    LblPrg: TLabel;
+    LblPers: TLabel;
     LblSlope: TLabel;
     LblGearH1: TLabel;
     lblRPMH1: TLabel;
@@ -69,6 +72,7 @@ type
     LEDSpeed: TLEDNumber;
     LEDWatt: TLEDNumber;
     LEDSlope: TLEDNumber;
+    LEDPulse: TLEDNumber;
     Memo: TMemo;
     KnobWatt: TmKnob;
     PC: TPageControl;
@@ -91,6 +95,7 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure KnobPulseChange(Sender: TObject; AValue: Longint);
     procedure PCChange(Sender: TObject);
     procedure SerialFakeRxData(Sender: TObject);
     procedure SerialFakeStatus(Sender: TObject; Reason: THookSerialReason;
@@ -110,7 +115,7 @@ type
     Time1,
     Time2 : byte;
     //
-    Gear, RPM, Spd : integer;
+    Gear, RPM, Spd, Pulse : integer;
     Slope : single;
     TimeRun, TimeDiff, AktTime, LastTime : QWord;
     DistanceRun: double;
@@ -229,6 +234,12 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   BuDisconnectClick(nil);
+end;
+
+procedure TMainForm.KnobPulseChange(Sender: TObject; AValue: Longint);
+begin
+   Pulse:= KnobPulse.Position;
+   LEDPulse.Caption:= Pulse.ToString;
 end;
 
 procedure TMainForm.PCChange(Sender: TObject);
@@ -387,6 +398,7 @@ begin
       result := true           // weitere zeichen anfordern
     else begin
       AktPrg:= ord(Frame[3]);
+      LblPrg.Caption:= 'Program: '+AktPrg.ToString;
       FTempStr := '';
       SendData:= #$23+DevAdr+Chr(AktPrg)+NTreten;
       DebugString(Memo,SendData,'Set Prog Ans-');
@@ -401,6 +413,7 @@ begin
     else begin
       TempB := ord(Frame[3]);
       AktPers:= TempB;
+      LblPers.Caption:= 'Person: '+AktPers.ToString;
       if ((TempB >= Low(Personen)) and (TempB <= High(Personen))) then begin
         with Personen[TempB] do begin
           Num         := TempB;
@@ -475,8 +488,8 @@ begin
       RPM := TBRPM.Position;
       if (Watt < 5) then watt := 5;
       if (Watt > 80) then Watt := 80;
-      //                         PRG         PERS         Treten       Watt       RPM     spd            Dist                   Tretzeit           joule      puls  zust  gang  relJoule
-      SendData:= #$40+DevAdr+char(AktPrg)+char(AktPers)+char(Tret)+char(watt)+char(RPM)+char(spd)+char(Dist1)+char(Dist2)+char(Time1)+char(Time2)+ #$00+#$00+ #$30+ #$00+ #$00+ #$00+#$00;
+      //                         PRG         PERS         Treten       Watt       RPM     spd            Dist                   Tretzeit           joule      puls         zust  gang       relJoule
+      SendData:= #$40+DevAdr+char(AktPrg)+char(AktPers)+char(Tret)+char(watt)+char(RPM)+char(spd)+char(Dist1)+char(Dist2)+char(Time1)+char(Time2)+ #$00+#$00+ char(Pulse)+ #$00+char(Gear)+ #$00+#$00;
       DebugString(Memo,SendData,'Suery Run Data Answ-');
       SerialFake.WriteData(SendData);
     end;
@@ -497,7 +510,7 @@ begin
     end;
   end
   else if (ord(Frame[1]) = $53)  then begin
-    // Set Power
+    // Set Gear
     Memo.Append('Set Gang Req');
     if length(frame) < 3 then
       result := true           // weitere zeichen anfordern
@@ -511,7 +524,7 @@ begin
     end;
   end
   else if (ord(Frame[1]) = $55)  then begin
-    // Set Power
+    // Set Slope
     Memo.Append('Set Slope Req');
     if length(frame) < 6 then
       result := true           // weitere zeichen anfordern

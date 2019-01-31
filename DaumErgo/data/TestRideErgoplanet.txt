@@ -1,0 +1,74 @@
+2< 10 00>
+Check Cockpit Req
+Check Cockpit Answ-3< 10 01 99>
+2< 73 00>
+Get Version Req
+Get Version Answ-11< 73 01 02 03 04 05 06 07 08 09 1E>
+4< 37 00 00 00>
+Get Config Req
+15< 37 00 00 00 00 00 00 00 00 00 00 00 00 00 00>
+Get Config Req
+Set Config Answ-11< 37 01 09 08 07 06 05 04 03 02 01>
+2< 12 00>
+Reset Dev Req
+Reset Dev Answ-2< 12 01>
+2< 21 00>
+Start Prog Req
+Start Prog Answ-3< 21 01 00>
+3< 23 00 00>
+Set Prog Req
+Set Prog Ans-4< 23 01 00 00>
+7< 24 00 01 00 00 AF 46>
+Set Person Req
+15< 24 00 01 00 00 AF 46 00 00 03 20 78 00 00 00>
+Set Person Req
+Set Person Ans-16< 24 00 01 00 00 AF 46 00 00 03 20 78 00 00 00 00>
+5< 69 00 00 00 01>
+Set Startparam Req
+Set Startparam Ans-5< 69 00 00 00 01>
+3< 53 00 0A>
+Set Gang Req
+Set Gang Answ-3< 53 01 0A>
+1< 51>
+Set Power Req
+3< 51 00 05>
+Set Power Req
+Set Power Answ-3< 51 01 05>
+2< 73 00>
+Get Version Req
+Get Version Answ-11< 73 01 02 03 04 05 06 07 08 09 1E>
+11< 37 00 00 00 00 00 00 00 00 00 00>
+Get Config Req
+Set Config Answ-11< 37 01 09 08 07 06 05 04 03 02 01>
+4< 00 00 00 00>
+2< 40 00>
+Query Run Data Req
+Suery Run Data Answ-19< 40 01 00 01 01 05 39 13 00 00 00 00 00 00 48 00 0A 00 00>
+6< 55 00 00 00 00 00>
+Set Slope Req
+Set Slope Answ-6< 55 01 00 00 00 00>
+2< 40 00>
+Query Run Data Req
+Suery Run Data Answ-19< 40 01 00 01 01 05 39 13 00 00 01 00 00 00 48 00 0A 00 00>
+6< 55 00 00 00 00 00>
+Set Slope Req
+Set Slope Answ-6< 55 01 00 00 00 00>
+2< 53 00>
+Set Gang Req
+3< 53 00 0B>
+Set Gang Req
+Set Gang Answ-3< 53 01 0B>
+2< 40 00>
+Query Run Data Req
+Suery Run Data Answ-19< 40 01 00 01 01 05 39 14 00 00 02 00 00 00 48 00 0B 00 00>
+2< 55 00>
+Set Slope Req
+6< 55 00 0E 04 26 3E>
+Set Slope Req
+Set Slope Answ-6< 55 01 0E 04 26 3E>
+3< 53 00 0C>
+Set Gang Req
+Set Gang Answ-3< 53 01 0C>
+2< 22 00>
+Stop Prg Req
+Stop Prg Answ-3< 22 01 00>
