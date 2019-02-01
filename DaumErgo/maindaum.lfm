@@ -75,7 +75,7 @@ object MainForm: TMainForm
         AnchorSideRight.Side = asrBottom
         Left = 320
         Height = 15
-        Top = 8
+        Top = 14
         Width = 32
         Anchors = []
         AutoSize = False
@@ -87,7 +87,7 @@ object MainForm: TMainForm
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 21
-        Top = 229
+        Top = 248
         Width = 85
         Anchors = [akLeft]
         BorderSpacing.Bottom = 10
@@ -102,7 +102,7 @@ object MainForm: TMainForm
         AnchorSideRight.Side = asrBottom
         Left = 10
         Height = 33
-        Top = 260
+        Top = 279
         Width = 65
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Left = 10
@@ -117,10 +117,10 @@ object MainForm: TMainForm
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Control = lblWattH1
         AnchorSideTop.Side = asrBottom
-        Left = 268
-        Height = 108
-        Top = 28
-        Width = 136
+        Left = 274
+        Height = 92
+        Top = 34
+        Width = 124
         BorderSpacing.Top = 5
         Position = 0
         MarkSize = 10
@@ -134,7 +134,7 @@ object MainForm: TMainForm
         AnchorSideTop.Side = asrBottom
         Left = 308
         Height = 32
-        Top = 136
+        Top = 131
         Width = 56
         Caption = '000'
       end
@@ -154,29 +154,30 @@ object MainForm: TMainForm
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Control = LblSlope
         AnchorSideTop.Side = asrBottom
-        Left = 90
+        Left = 17
         Height = 30
-        Top = 125
-        Width = 204
+        Top = 77
+        Width = 119
         Caption = '0000'
-        Columns = 12
+        Columns = 7
       end
       object LblSlope: TLabel
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Side = asrBottom
-        Left = 172
+        Left = 56
         Height = 21
-        Top = 104
+        Top = 56
         Width = 40
         Anchors = []
         BorderSpacing.Top = 15
         Caption = 'Slope'
         ParentColor = False
+        OnClick = LblSlopeClick
       end
       object VLEPerson: TValueListEditor
-        Left = 488
-        Height = 276
-        Top = 96
+        Left = 416
+        Height = 320
+        Top = 48
         Width = 184
         FixedCols = 0
         RowCount = 2
@@ -189,9 +190,9 @@ object MainForm: TMainForm
       object LblSpeed: TLabel
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Side = asrBottom
-        Left = 168
+        Left = 56
         Height = 21
-        Top = 28
+        Top = 120
         Width = 44
         Anchors = []
         BorderSpacing.Top = 15
@@ -203,53 +204,49 @@ object MainForm: TMainForm
         AnchorSideLeft.Side = asrCenter
         AnchorSideTop.Control = LblSpeed
         AnchorSideTop.Side = asrBottom
-        Left = 154
+        Left = 42
         Height = 32
-        Top = 49
+        Top = 141
         Width = 72
         Caption = '0000'
       end
-      object EdtTestOut: TEdit
-        Left = 96
-        Height = 33
-        Top = 336
-        Width = 376
-        TabOrder = 4
-        Text = 'EdtTestOut'
-      end
       object LblPrg: TLabel
-        Left = 490
+        Left = 16
         Height = 21
-        Top = 68
+        Top = 14
         Width = 112
         AutoSize = False
         Caption = 'Program'
         ParentColor = False
       end
       object LblPers: TLabel
-        Left = 490
+        Left = 416
         Height = 21
-        Top = 40
+        Top = 8
         Width = 112
         AutoSize = False
         Caption = 'Person'
         ParentColor = False
       end
       object LEDPulse: TLEDNumber
+        AnchorSideLeft.Control = KnobPulse
         AnchorSideLeft.Side = asrCenter
+        AnchorSideTop.Control = KnobPulse
         AnchorSideTop.Side = asrBottom
-        Left = 312
+        Left = 188
         Height = 32
-        Top = 280
+        Top = 135
         Width = 56
         Caption = '000'
       end
       object KnobPulse: TmKnob
+        AnchorSideLeft.Control = lblPulse
         AnchorSideLeft.Side = asrCenter
+        AnchorSideTop.Control = lblPulse
         AnchorSideTop.Side = asrBottom
-        Left = 280
+        Left = 160
         Height = 96
-        Top = 176
+        Top = 34
         Width = 112
         BorderSpacing.Top = 5
         Position = 60
@@ -258,6 +255,37 @@ object MainForm: TMainForm
         Max = 200
         Min = 30
         OnChange = KnobPulseChange
+      end
+      object lblPulse: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideRight.Side = asrBottom
+        Left = 200
+        Height = 15
+        Top = 14
+        Width = 32
+        Anchors = []
+        AutoSize = False
+        Caption = 'Pulse'
+        ParentColor = False
+      end
+      object CBBikeType: TComboBox
+        Left = 6
+        Height = 33
+        Top = 335
+        Width = 272
+        ItemHeight = 0
+        ItemIndex = 1
+        Items.Strings = (
+          'Cardio'
+          'Update Vita de Luxe'
+          'Fitness'
+          '8008'
+          '8080'
+          'unknown'
+          'Therapy'
+        )
+        TabOrder = 5
+        Text = 'Update Vita de Luxe'
       end
     end
     object TS_Msg: TTabSheet
@@ -380,26 +408,26 @@ object MainForm: TMainForm
     RcvLineCRLF = False
     OnRxData = SerialFakeRxData
     OnStatus = SerialFakeStatus
-    Left = 504
-    Top = 16
+    Left = 208
+    Top = 88
   end
   object ActionList: TActionList
     Images = ImageList
-    Left = 413
-    Top = 16
+    Left = 328
+    Top = 88
     object ActQuit: TAction
       Caption = 'Quit'
       OnExecute = ActQuitExecute
     end
   end
   object ImageList: TImageList
-    Left = 413
-    Top = 80
+    Left = 280
+    Top = 208
   end
   object XMLPropStorage1: TXMLPropStorage
     StoredValues = <>
-    Left = 80
-    Top = 108
+    Left = 272
+    Top = 16
   end
   object Timer1: TTimer
     Enabled = False

@@ -56,8 +56,8 @@ type
     BuDisconnect: TButton;
     BuTest: TButton;
     CBAutoCon: TCheckBox;
+    CBBikeType: TComboBox;
     EdGear1: TSpinEdit;
-    EdtTestOut: TEdit;
     EdSerialPort: TEdit;
     ImageList: TImageList;
     KnobPulse: TmKnob;
@@ -68,6 +68,7 @@ type
     lblRPMH1: TLabel;
     LblSpeed: TLabel;
     lblWattH1: TLabel;
+    lblPulse: TLabel;
     LEDRPM: TLEDNumber;
     LEDSpeed: TLEDNumber;
     LEDWatt: TLEDNumber;
@@ -96,6 +97,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure KnobPulseChange(Sender: TObject; AValue: Longint);
+    procedure LblSlopeClick(Sender: TObject);
     procedure PCChange(Sender: TObject);
     procedure SerialFakeRxData(Sender: TObject);
     procedure SerialFakeStatus(Sender: TObject; Reason: THookSerialReason;
@@ -240,6 +242,11 @@ procedure TMainForm.KnobPulseChange(Sender: TObject; AValue: Longint);
 begin
    Pulse:= KnobPulse.Position;
    LEDPulse.Caption:= Pulse.ToString;
+end;
+
+procedure TMainForm.LblSlopeClick(Sender: TObject);
+begin
+
 end;
 
 procedure TMainForm.PCChange(Sender: TObject);
@@ -530,8 +537,7 @@ begin
       result := true           // weitere zeichen anfordern
     else begin
       Slope:= BytesToSingle(ord(Frame[3]),ord(Frame[4]),ord(Frame[5]),ord(Frame[6]));
-      EdtTestOut.Text:= Slope.ToString;
-      LEDSlope.Caption:= FloatToStr(Slope);
+      LEDSlope.Caption:= FloatToStrF(Slope,ffFixed,4,2);
       FTempStr := '';
       SendData:= #$55+DevAdr+Frame[3]+Frame[4]+Frame[5]+Frame[6];
       DebugString(Memo,SendData,'Set Slope Answ-');
