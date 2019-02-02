@@ -134,7 +134,7 @@ object MainForm: TMainForm
         AnchorSideTop.Side = asrBottom
         Left = 308
         Height = 32
-        Top = 131
+        Top = 126
         Width = 56
         Caption = '000'
       end
@@ -235,7 +235,7 @@ object MainForm: TMainForm
         AnchorSideTop.Side = asrBottom
         Left = 188
         Height = 32
-        Top = 135
+        Top = 130
         Width = 56
         Caption = '000'
       end
@@ -274,11 +274,11 @@ object MainForm: TMainForm
         Top = 335
         Width = 272
         ItemHeight = 0
-        ItemIndex = 1
         Items.Strings = (
           'Cardio'
           'Update Vita de Luxe'
           'Fitness'
+          'Vita de Luxe'
           '8008'
           '8080'
           'unknown'

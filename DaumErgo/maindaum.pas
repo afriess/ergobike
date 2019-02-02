@@ -15,7 +15,7 @@ const
   Treten =  #$01;
   NTreten=  #$00;
 
-  DevType= #$1E;
+
 
   // Cockpittypen Classic Line
   CockpitUnknown = 0;
@@ -116,6 +116,7 @@ type
     Dist2,
     Time1,
     Time2 : byte;
+    DevType : byte; //#$1E;
     //
     Gear, RPM, Spd, Pulse : integer;
     Slope : single;
@@ -392,8 +393,20 @@ begin
       result := true           // weitere zeichen anfordern
     else begin
       FTempStr := '';
+      case CBBikeType.ItemIndex of
+        0 : DevType:= $10;  // Cardio
+        1 : DevType:= $1E;  // Vita de Luxe update
+        2 : DevType:= $20;  // Fitness
+        3 : DevType:= $30;  // Vita de Luxe
+        4 : DevType:= $40;  // 8008
+        5 : DevType:= $50;  // 8080
+        6 : DevType:= $55;  // ??
+        7 : DevType:= $60;  // Therapy
+      else
+        DevType:= $1E; // Fallback
+      end;
       sleep(10);
-      SendData:= #$73+DevAdr+#$02+#$03+#$04+#$05+#$06+#$07+#$08+#$09+DevType;
+      SendData:= #$73+DevAdr+#$02+#$03+#$04+#$05+#$06+#$07+#$08+#$09+chr(DevType);
       DebugString(Memo,SendData,'Get Version Answ-');
       SerialFake.WriteData(SendData);
     end;
